@@ -292,7 +292,29 @@ function updateTotalsUI() {
     if (btn) btn.textContent = `Confirmar Pedido no valor de ${money(final)}`;
 }
 
+function mostrarPixModal(qrCode, qrImage) {
+  const modal = document.getElementById("pix-modal");
+  const pixCodeInput = document.getElementById("pix-code");
+  const pixImage = document.getElementById("pix-image");
+
+  pixCodeInput.value = qrCode;
+  pixImage.src = qrImage;
+
+  modal.classList.remove("hidden");
+
+  document.getElementById("copy-btn").onclick = () => {
+    navigator.clipboard.writeText(qrCode);
+    alert("Código PIX copiado!");
+  };
+
+  document.getElementById("close-pix").onclick = () => {
+    modal.classList.add("hidden");
+  };
+}
+
+
 document.addEventListener('DOMContentLoaded', updateTotalsUI);
+
 
 
 
