@@ -312,8 +312,9 @@ function updateTotalsUI() {
 
 function mostrarPixModal(qr, code) {
     document.getElementById("pix-modal").classList.remove("hidden");
-    document.getElementById("pix-qrcode").src = qr;
-    document.getElementById("pix-copy").value = code;
+    document.getElementById("pix-code").value = data.qrCode;
+document.getElementById("pix-image").src = data.qrCodeImage;
+
 
     document.getElementById("copy-btn").onclick = () => {
         navigator.clipboard.writeText(code);
@@ -343,6 +344,7 @@ function iniciarTimerPix() {
 
 
 document.addEventListener('DOMContentLoaded', updateTotalsUI);
+
 
 
 
