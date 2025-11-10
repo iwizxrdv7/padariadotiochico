@@ -151,6 +151,8 @@ document.addEventListener("DOMContentLoaded", () => {
     cepInput.addEventListener("blur", validateCEP);
 
     // --------- (opcional) Validação básica ao confirmar
+    confirmBtn.addEventListener("click", async () => {
+        if (confirmBtn.disabled) return;
 
         const nome = el("nome").value.trim();
         const cpf = cpfInput.value.replace(/\D/g, "");
@@ -291,19 +293,6 @@ function updateTotalsUI() {
 }
 
 document.addEventListener('DOMContentLoaded', updateTotalsUI);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
