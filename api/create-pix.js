@@ -40,7 +40,13 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    return res.status(response.status).json(data);
+    return res.status(response.status).json({
+  pix: {
+    qrcode: data.qrCode,         // código copia e cola
+    code: data.qrCode,           // alias para compatibilidade
+    qrcodeImage: data.qrCodeImage // imagem base64
+  }
+});
 
   } catch (e) {
     console.log("PIX ERROR =>", e);
