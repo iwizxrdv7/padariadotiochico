@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     const { orderId, amount, items, customer } = req.body;
 
     const payload = {
-      amount: Math.round(amount * 100), // converter para centavos
+      amount: Math.round(amount * 100), // centavos
       paymentMethod: "pix",
       items: items.map(item => ({
         title: item.name,
@@ -20,14 +20,16 @@ export default async function handler(req, res) {
         documents: customer.cpf ? [{ type: "cpf", number: customer.cpf }] : undefined,
         phoneNumber: customer.whats
       },
-      postbackUrl: `${req.headers.host}/api/webhook`,
+      postbackUrl: `https://${req.headers.host}/api/webhook`,
       metadata: { orderId }
     };
+
+    const token = Buffer.from(`${SECRET}:`).toString("base64");
 
     const response = await fetch("https://api.conta.paybeehive.com.br/v1/transactions", {
       method: "POST",
       headers: {
-        Authorization: `Basic ${Buffer.from(`${SECRET}:`).toString("base64")}`,
+        "Authorization": `Basic ${token}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify(payload)
@@ -35,11 +37,13 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    if (!data.qrCode || !data.qrCodeImage) {
-      return res.status(400).json({ error: "Erro ao gerar PIX", details: data });
+    console.log("BEEHIVE RESPONSE →", data);
+
+    if (!response.ok) {
+      return res.status(response.status).json({ error: "Erro ao gerar PIX", details: data });
     }
 
-    return res.status(response.status).json({
+    return res.status(200).json({
       qrcode: data.qrCode,
       qrcodeImage: data.qrCodeImage,
       expiresAt: data.expiresAt
@@ -49,11 +53,4 @@ export default async function handler(req, res) {
     console.error("PIX ERROR =>", error);
     return res.status(500).json({ error: "Erro interno ao gerar PIX" });
   }
-
-  const data = await response.json();
-
-console.log("BEEHIVE RESPONSE →", data); // ADICIONE ESTA LINHA
-
-return res.status(response.status).json(data);
-
 }
