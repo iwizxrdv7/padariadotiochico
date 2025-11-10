@@ -4,49 +4,53 @@ export default async function handler(req, res) {
   }
 
   try {
-    const SECRET = process.env.BEEHIVE_SECRET;
+    const CLIENT_ID = process.env.BEEHIVE_CLIENT_ID;
+    const CLIENT_SECRET = process.env.BEEHIVE_SECRET;
+    const token = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64");
+
     const { orderId, amount, items, customer } = req.body;
 
     const payload = {
-      amount: Math.round(amount * 100), // valor em centavos
+      amount: Math.round(amount * 100),
       paymentMethod: "pix",
-      items: items.map(item => ({
-        title: item.name,
-        quantity: item.qty,
-        unitPrice: Math.round(item.price * 100)
-      })),
       customer: {
         name: customer.nome,
-        documents: customer.cpf ? [{ type: "cpf", number: customer.cpf }] : undefined,
-        phoneNumber: customer.whats
+        document: { type: "cpf", number: customer.cpf },
+        phone: customer.whats
       },
-      postbackUrl: `https://${req.headers.host}/api/webhook`,
-      metadata: { orderId }
+      items: items.map(item => ({
+        title: item.name,
+        unitPrice: Math.round(item.price * 100),
+        quantity: item.qty
+      })),
+      pix: { expiresInDays: 1 },
+      metadata: orderId,
+      postbackUrl: `https://${req.headers.host}/api/webhook`
     };
 
     const response = await fetch("https://api.conta.paybeehive.com.br/v1/transactions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${SECRET}`,
+        Authorization: `Basic ${token}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();
 
-    if (!data.qrCode || !data.qrCodeImage) {
+    if (!data.pix || !data.pix.qrCode) {
       return res.status(400).json({ error: "Erro ao gerar PIX", details: data });
     }
 
-    return res.status(response.status).json({
-      qrcode: data.qrCode,
-      qrcodeImage: data.qrCodeImage,
-      expiresAt: data.expiresAt
+    return res.status(200).json({
+      qrcode: data.pix.qrCode,
+      qrcodeImage: data.pix.qrCodeImage,
+      expiresAt: data.pix.expiresAt
     });
 
-  } catch (error) {
-    console.error("PIX ERROR =>", error);
-    return res.status(500).json({ error: "Erro interno ao gerar PIX" });
+  } catch (e) {
+    console.log("PIX ERROR =>", e);
+    return res.status(500).json({ error: "Falha interna ao gerar PIX" });
   }
 }
