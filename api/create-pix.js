@@ -49,4 +49,11 @@ export default async function handler(req, res) {
     console.error("PIX ERROR =>", error);
     return res.status(500).json({ error: "Erro interno ao gerar PIX" });
   }
+
+  const data = await response.json();
+
+console.log("BEEHIVE RESPONSE →", data); // ADICIONE ESTA LINHA
+
+return res.status(response.status).json(data);
+
 }
