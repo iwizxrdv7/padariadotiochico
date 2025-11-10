@@ -291,7 +291,49 @@ function updateTotalsUI() {
     if (btn) btn.textContent = `Confirmar Pedido no valor de ${money(final)}`;
 }
 
+    function mostrarPixModal(qrCodeText, qrCodeImageBase64) {
+  document.getElementById("pix-modal").style.display = "flex";
+
+  document.getElementById("pix-code").value = qrCodeText;
+
+  // caso venha com base64 pronto:
+  document.getElementById("pix-image").src = "data:image/png;base64," + qrCodeImageBase64;
+
+  iniciarTimerPix();
+}
+
+function fecharPixModal() {
+  document.getElementById("pix-modal").style.display = "none";
+}
+
+// COPIAR PIX
+document.addEventListener("click", e => {
+  if (e.target.id === "copy-btn") {
+    const code = document.getElementById("pix-code").value;
+    navigator.clipboard.writeText(code);
+    alert("Código PIX copiado!");
+  }
+});
+
+// TIMER PIX 15 MIN
+function iniciarTimerPix() {
+  let t = 15 * 60;
+  const el = document.getElementById("pix-timer-count");
+
+  function update() {
+    const m = Math.floor(t / 60);
+    const s = t % 60;
+    el.textContent = `${m}:${s < 10 ? "0" : ""}${s}`;
+    if (t <= 0) return;
+    t--;
+    setTimeout(update, 1000);
+  }
+  update();
+}
+
+
 document.addEventListener('DOMContentLoaded', updateTotalsUI);
+
 
 
 
