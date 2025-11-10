@@ -4,11 +4,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const PUBLIC = process.env.BEEHIVE_PUBLIC;
     const SECRET = process.env.BEEHIVE_SECRET;
 
-    // AQUI ESTAVA O ERRO
-    const auth = Buffer.from(`${PUBLIC}:${SECRET}`).toString("base64");
+    if (!SECRET) {
+      console.log("ERRO: BEEHIVE_SECRET não encontrado no ambiente");
+      return res.status(500).json({ error: "Chave não configurada" });
+    }
+
+    // Auth correto para Beehive (IMPORTANTE!)
+    const auth = Buffer.from(`${SECRET}:`).toString("base64");
 
     const { orderId, amount, items, customer } = req.body;
 
@@ -17,7 +21,7 @@ export default async function handler(req, res) {
       paymentMethod: "pix",
       customer: {
         name: customer.nome,
-        document: { type: "cpf", number: customer.cpf },
+        documents: [{ type: "cpf", number: customer.cpf }],
         phoneNumber: customer.whats
       },
       items: items.map(item => ({
@@ -40,13 +44,13 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+    console.log("RESPOSTA BEEHIVE:", data);
 
-    // Se der erro, joga na cara pra debug
     if (!data.qrCode) {
       return res.status(400).json({ error: "Erro ao gerar PIX", details: data });
     }
 
-    return res.status(200).json({
+    return res.json({
       pix: {
         qrcode: data.qrCode,
         code: data.qrCode,
