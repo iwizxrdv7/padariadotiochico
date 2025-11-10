@@ -292,69 +292,8 @@ function updateTotalsUI() {
     if (btn) btn.textContent = `Confirmar Pedido no valor de ${money(final)}`;
 }
 
-function mostrarPixModal(qrCode, qrImage) {
-  const modal = document.getElementById("pix-modal");
-  const pixCodeInput = document.getElementById("pix-code");
-  const pixImage = document.getElementById("pix-image");
-
-  pixCodeInput.value = qrCode;
-  pixImage.src = qrImage;
-
-  modal.classList.remove("hidden");
-
-  document.getElementById("copy-btn").onclick = () => {
-    navigator.clipboard.writeText(qrCode);
-    alert("Código PIX copiado!");
-  };
-
-  document.getElementById("close-pix").onclick = () => {
-    modal.classList.add("hidden");
-  };
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("SCRIPT INICIADO ✅");
-
-  const confirmBtn = document.getElementById("confirm-btn");
-  if (!confirmBtn) {
-    console.error("❌ ERRO: confirm-btn não encontrado no HTML.");
-    return;
-  }
-
-  confirmBtn.addEventListener("click", async () => {
-    console.log("BOTÃO CLICADO ✅");
-
-    const items = getCartItems();
-    if (!items.length) return alert("Carrinho vazio.");
-
-    const subtotal = calcSubtotal(items);
-    const delivery = subtotal >= DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-    const totalFinal = subtotal + delivery;
-
-    const nome = document.getElementById("nome").value.trim();
-    const cpf = document.getElementById("cpf").value.replace(/\D/g, "");
-    const whats = document.getElementById("whatsapp").value.replace(/\D/g, "");
-
-    const resp = await fetch("/api/create-pix", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: Math.round(totalFinal * 100),
-        items,
-        customer: { nome, cpf, whats }
-      })
-    });
-
-    const data = await resp.json();
-    console.log("RESPOSTA API:", data);
-
-    if (!data.pix) return alert("Erro ao gerar PIX.");
-
-    mostrarPixModal(data.pix.code, data.pix.qrcodeImage);
-  });
-});
-
 document.addEventListener('DOMContentLoaded', updateTotalsUI);
+
 
 
 
