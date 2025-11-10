@@ -12,20 +12,28 @@ export default async function handler(req, res) {
     const { orderId, amount, items, customer } = req.body;
 
     const payload = {
-      amount,
+      amount, // já vem em centavos do frontend
       paymentMethod: "pix",
+      
       customer: {
         name: customer.nome,
-        document: { type: "cpf", number: customer.cpf },
-        phone: customer.whats
+        documents: [
+          { type: "cpf", number: customer.cpf }
+        ],
+        phoneNumber: customer.whats
       },
+
       items: items.map(item => ({
         title: item.name,
         unitPrice: Math.round(item.price * 100),
-        quantity: item.qty
+        quantity: item.qty,
+        tangible: false
       })),
+
       pix: { expiresInDays: 1 },
+
       metadata: { orderId },
+
       postbackUrl: `https://${req.headers.host}/api/webhook`
     };
 
@@ -40,11 +48,13 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
+    console.log("BEEHIVE RESPONSE =>", data); // deixa isso pra debug
+
     return res.status(response.status).json({
       pix: {
-        qrcode: data.qrCode,        // código copia e cola
-        code: data.qrCode,          // compat
-        qrcodeImage: data.qrCodeImage // imagem base64
+        qrcode: data.qrCode,
+        code: data.qrCode,
+        qrcodeImage: data.qrCodeImage
       }
     });
 
