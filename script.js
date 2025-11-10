@@ -294,8 +294,6 @@ function updateTotalsUI() {
 
 document.addEventListener('DOMContentLoaded', updateTotalsUI);
 
-document.addEventListener("DOMContentLoaded", updateTotalS);
-
 // --- PIX SCRIPT --- //
 document.getElementById("confirm-btn").addEventListener("click", async () => {
   console.log("BOTÃO CONFIRMADO ✅");
@@ -329,3 +327,4 @@ document.getElementById("confirm-btn").addEventListener("click", async () => {
   document.getElementById("pix-code").value = data.qrcode;
   document.getElementById("pix-modal").style.display = "flex";
 });
+
