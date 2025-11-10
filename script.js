@@ -292,84 +292,8 @@ function updateTotalsUI() {
     if (btn) btn.textContent = `Confirmar Pedido no valor de ${money(final)}`;
 }
 
-function mostrarPixModal(qrCodeText, qrCodeImageBase64) {
-  document.getElementById("pix-modal").style.display = "flex";
-
-  document.getElementById("pix-code").value = qrCodeText;
-
-  // caso venha com base64 pronto:
-  document.getElementById("pix-image").src = "data:image/png;base64," + qrCodeImageBase64;
-
-  iniciarTimerPix();
-}
-
-function fecharPixModal() {
-  document.getElementById("pix-modal").style.display = "none";
-}
-
-// COPIAR PIX
-document.addEventListener("click", e => {
-  if (e.target.id === "copy-btn") {
-    const code = document.getElementById("pix-code").value;
-    navigator.clipboard.writeText(code);
-    alert("Código PIX copiado!");
-  }
-});
-
-// TIMER PIX 15 MIN
-function iniciarTimerPix() {
-  let t = 15 * 60;
-  const el = document.getElementById("pix-timer-count");
-
-  function update() {
-    const m = Math.floor(t / 60);
-    const s = t % 60;
-    el.textContent = `${m}:${s < 10 ? "0" : ""}${s}`;
-    if (t <= 0) return;
-    t--;
-    setTimeout(update, 1000);
-  }
-  update();
-}
-
-document.getElementById("confirm-btn").addEventListener("click", async () => {
-
-  const nome = document.getElementById("nome").value.trim();
-  const cpf = document.getElementById("cpf").value.replace(/\D/g, "");
-  const phone = document.getElementById("whatsapp").value.replace(/\D/g, "");
-
-  const items = JSON.parse(localStorage.getItem("pdc_cart_v1") || "[]");
-
-  if (!items.length) return alert("Carrinho vazio.");
-
-  const subtotal = items.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const delivery = subtotal >= 19.99 ? 0 : 4.88;
-  const totalFinal = subtotal + delivery;
-
-  // CHAMAR O PHP
-  const resp = await fetch("/criar-pix.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      orderId: Date.now(),
-      amount: Math.round(totalFinal * 100),
-      items,
-      customer: { nome, cpf, whats: phone }
-    })
-  });
-
-  const data = await resp.json();
-  console.log("RESPOSTA DO PHP =>", data);
-
-  if (data.pix) {
-    mostrarPixModal(data.pix.qrCode, data.pix.qrCodeImage);
-  } else {
-    alert("Erro ao gerar PIX");
-  }
-});
-
-
 document.addEventListener('DOMContentLoaded', updateTotalsUI);
+
 
 
 
