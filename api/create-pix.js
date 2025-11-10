@@ -10,10 +10,10 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer sk_live_v2vrnO9Ru3iRM273bUGBS6nMHd4fBgiB1OMnwFObm9`
+        Authorization: `Bearer ${process.env.BEEHIVE_SECRET}`
       },
       body: JSON.stringify({
-        amount: Math.round(amount * 100), // converte para centavos
+        amount: Math.round(amount * 100),
         currency: "BRL",
         description: `Pedido #${orderId}`,
       }),
