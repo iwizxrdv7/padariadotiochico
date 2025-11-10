@@ -310,7 +310,7 @@ function updateTotalsUI() {
     if (btn) btn.textContent = `Confirmar Pedido no valor de ${money(final)}`;
 }
 
-function mostrarPixModal(qr, code) {
+function mostrarPixModal(responseData);
     document.getElementById("pix-modal").classList.remove("hidden");
     document.getElementById("pix-code").value = data.qrCode;
 document.getElementById("pix-image").src = data.qrCodeImage;
@@ -344,6 +344,7 @@ function iniciarTimerPix() {
 
 
 document.addEventListener('DOMContentLoaded', updateTotalsUI);
+
 
 
 
