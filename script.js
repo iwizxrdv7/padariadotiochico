@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', updateTotalsUI);
 document.getElementById("confirm-btn").addEventListener("click", async () => {
   console.log("BOTÃO CONFIRMADO ✅");
 
-  const name = document.getElementById("name").value;
+  const name = document.getElementById("nome").value;
   const cpf = document.getElementById("cpf").value;
   const whatsapp = document.getElementById("whatsapp").value;
   const totalText = document.getElementById("total-value").textContent;
@@ -327,4 +327,5 @@ document.getElementById("confirm-btn").addEventListener("click", async () => {
   document.getElementById("pix-code").value = data.qrcode;
   document.getElementById("pix-modal").style.display = "flex";
 });
+
 
