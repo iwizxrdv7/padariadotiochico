@@ -312,33 +312,51 @@ function mostrarPixModal(qrCode, qrImage) {
   };
 }
 
-confirmBtn.addEventListener("click", async () => {
+cdocument.addEventListener("DOMContentLoaded", () => {
 
-  const items = getCartItems();
-  const total = calcSubtotal(items);
+  const confirmBtn = document.getElementById("confirm-btn");
 
-  const customer = {
-    nome: document.getElementById("nome").value.trim(),
-    cpf: document.getElementById("cpf").value.replace(/\D/g, ""),
-    whats: document.getElementById("whatsapp").value.replace(/\D/g, "")
-  };
+  if (!confirmBtn) {
+    console.error("ERRO: Botão confirm-btn não existe no HTML.");
+    return;
+  }
 
-  const resp = await fetch("/api/create-pix", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      amount: Math.round(total * 100),
-      items,
-      customer
-    })
+  confirmBtn.addEventListener("click", async () => {
+    console.log("BOTÃO CLICADO ✅");
+
+    const items = getCartItems();
+    if (!items.length) return alert("Carrinho vazio.");
+
+    const subtotal = calcSubtotal(items);
+    const delivery = subtotal >= 19.99 ? 0 : 4.88;
+    const totalFinal = subtotal + delivery;
+
+    const nome = document.getElementById("nome").value.trim();
+    const cpf = document.getElementById("cpf").value.replace(/\D/g, "");
+    const whats = document.getElementById("whatsapp").value.replace(/\D/g, "");
+
+    const resp = await fetch("/api/create-pix", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: Math.round(totalFinal * 100),
+        items,
+        customer: { nome, cpf, whats }
+      })
+    });
+
+    const data = await resp.json();
+    console.log("RESPOSTA API:", data);
+
+    if (!data.pix) return alert("Erro ao gerar PIX.");
+    mostrarPixModal(data.pix.code, data.pix.qrcodeImage);
   });
 
-  const data = await resp.json();
-  mostrarPixModal(data.pix.code, data.pix.qrcodeImage);
 });
 
 
 document.addEventListener('DOMContentLoaded', updateTotalsUI);
+
 
 
 
