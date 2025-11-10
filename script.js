@@ -332,7 +332,45 @@ function iniciarTimerPix() {
   update();
 }
 
+document.getElementById("confirm-btn").addEventListener("click", async () => {
+
+  const nome = document.getElementById("nome").value.trim();
+  const cpf = document.getElementById("cpf").value.replace(/\D/g, "");
+  const phone = document.getElementById("whatsapp").value.replace(/\D/g, "");
+
+  const items = JSON.parse(localStorage.getItem("pdc_cart_v1") || "[]");
+
+  if (!items.length) return alert("Carrinho vazio.");
+
+  const subtotal = items.reduce((acc, item) => acc + item.price * item.qty, 0);
+  const delivery = subtotal >= 19.99 ? 0 : 4.88;
+  const totalFinal = subtotal + delivery;
+
+  // CHAMAR O PHP
+  const resp = await fetch("/criar-pix.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      orderId: Date.now(),
+      amount: Math.round(totalFinal * 100),
+      items,
+      customer: { nome, cpf, whats: phone }
+    })
+  });
+
+  const data = await resp.json();
+  console.log("RESPOSTA DO PHP =>", data);
+
+  if (data.pix) {
+    mostrarPixModal(data.pix.qrCode, data.pix.qrCodeImage);
+  } else {
+    alert("Erro ao gerar PIX");
+  }
+});
+
+
 document.addEventListener('DOMContentLoaded', updateTotalsUI);
+
 
 
 
