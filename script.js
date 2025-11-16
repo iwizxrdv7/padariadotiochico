@@ -345,14 +345,20 @@ async function gerarPix() {
     return;
   }
 
-  // e-mail automático
-  const customerEmail = `${whatsapp}@padariadochico.com`;
+  // EMAIL AUTOMÁTICO
+  const emailFake = `${whatsapp}@padariadochico.com`;
 
-  // BLOCO CUSTOMER COMPLETO (AGORA COM CPF)
+  // DOCUMENTO NO FORMATO CORRETO
+  const documentData = {
+    type: "cpf",
+    number: cpf
+  };
+
+  // BLOCO CUSTOMER COMPLETO
   const customer = {
     name: nome,
-    email: customerEmail,
-    document: cpf // <--- OBRIGATÓRIO
+    email: emailFake,
+    document: documentData
   };
 
   // ===== PEGAR ITENS DO CARRINHO =====
@@ -362,19 +368,18 @@ async function gerarPix() {
     return;
   }
 
-  // ===== FORMATO EXATO DOS ITEMS =====
   const items = cart.slice(0, 5).map(item => ({
     title: item.name,
-    unitPrice: Math.round(Number(item.price) * 100),
+    unitPrice: Math.round(Number(item.price) * 100), // centavos
     quantity: item.qty,
     tangible: true
   }));
 
-  // ===== PEGAR VALOR FINAL DO BOTÃO =====
+  // ===== PEGAR TOTAL DO BOTÃO =====
   const totalText = document.getElementById("confirm-btn").textContent;
-  const valorFinal = Number(totalText.replace(/\D/g, ""));
+  const valorFinal = Number(totalText.replace(/\D/g, "")); // centavos
 
-  // ===== MONTAR BODY =====
+  // ===== BODY FINAL =====
   const body = {
     amount: valorFinal,
     paymentMethod: "pix",
@@ -386,6 +391,7 @@ async function gerarPix() {
   console.log("BODY ENVIADO:", body);
 
   try {
+
     const token = "c2tfbGl2ZV92MnZybk85UnUzdGsyVE11VE9vc1N0Vmw2VGN3YnJYRVk4TjJLbXBuUHA6eA==";
 
     const req = await fetch("https://api.conta.paybeehive.com.br/v1/transactions", {
@@ -405,14 +411,14 @@ async function gerarPix() {
       return;
     }
 
-    // ABRIR POPUP COM O PIX
+    // EXIBE PIX NO POP-UP
     abrirPopUp(
       data.pix.qr_code_base64,
       data.pix.qr_code_text
     );
 
-  } catch (erro) {
-    console.log("ERRO API:", erro);
+  } catch (error) {
+    console.log("ERRO API:", error);
     alert("Erro ao gerar PIX.");
   }
 }
@@ -434,6 +440,8 @@ document.getElementById("copyPixBtn").addEventListener("click", () => {
 document.getElementById("closePix").addEventListener("click", () => {
   document.getElementById("pixOverlay").style.display = "none";
 });
+
+
 
 
 
