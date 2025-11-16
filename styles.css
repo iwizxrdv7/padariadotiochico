@@ -348,12 +348,12 @@ body {
 }
 
 #pixBox {
-  background: #fff;
+  background: #ffffff;
   width: 350px;
   padding: 25px;
   border-radius: 14px;
   text-align: center;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   box-shadow: 0 0 20px rgba(0,0,0,0.4);
 }
 
@@ -402,3 +402,4 @@ body {
   font-size: 14px;
   color: #444;
 }
+
