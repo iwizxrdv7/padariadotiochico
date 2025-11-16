@@ -337,18 +337,22 @@ async function gerarPix() {
 
   // ===== PEGAR DADOS DO CLIENTE =====
   const nome = document.getElementById("nome").value.trim();
+  const cpf = document.getElementById("cpf").value.replace(/\D/g, "");
   const whatsapp = document.getElementById("whatsapp").value.replace(/\D/g, "");
 
-  if (!nome || whatsapp.length < 10) {
-    alert("Preencha seu nome e WhatsApp antes de continuar.");
+  if (!nome || whatsapp.length < 10 || cpf.length !== 11) {
+    alert("Preencha Nome, WhatsApp e CPF corretamente.");
     return;
   }
 
+  // e-mail automático
   const customerEmail = `${whatsapp}@padariadochico.com`;
 
+  // BLOCO CUSTOMER COMPLETO (AGORA COM CPF)
   const customer = {
     name: nome,
-    email: customerEmail
+    email: customerEmail,
+    document: cpf // <--- OBRIGATÓRIO
   };
 
   // ===== PEGAR ITENS DO CARRINHO =====
@@ -358,19 +362,19 @@ async function gerarPix() {
     return;
   }
 
-  // ===== FORMATO OFICIAL BEEHIVE =====
+  // ===== FORMATO EXATO DOS ITEMS =====
   const items = cart.slice(0, 5).map(item => ({
-    title: item.name,                                  // título obrigatório
-    unitPrice: Math.round(Number(item.price) * 100),   // inteiro em centavos
+    title: item.name,
+    unitPrice: Math.round(Number(item.price) * 100),
     quantity: item.qty,
-    tangible: true                                     // produto físico
+    tangible: true
   }));
 
-  // ===== PEGAR VALOR FINAL (BOTÃO) =====
+  // ===== PEGAR VALOR FINAL DO BOTÃO =====
   const totalText = document.getElementById("confirm-btn").textContent;
-  const valorFinal = Number(totalText.replace(/\D/g, "")); // centavos
+  const valorFinal = Number(totalText.replace(/\D/g, ""));
 
-  // ===== MONTAR BODY FINAL CORRETO =====
+  // ===== MONTAR BODY =====
   const body = {
     amount: valorFinal,
     paymentMethod: "pix",
@@ -430,6 +434,8 @@ document.getElementById("copyPixBtn").addEventListener("click", () => {
 document.getElementById("closePix").addEventListener("click", () => {
   document.getElementById("pixOverlay").style.display = "none";
 });
+
+
 
 
 
