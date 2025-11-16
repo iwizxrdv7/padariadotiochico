@@ -293,39 +293,7 @@ function updateTotalsUI() {
 }
 
 document.addEventListener('DOMContentLoaded', updateTotalsUI);
-
-// --- PIX SCRIPT --- //
-document.getElementById("confirm-btn").addEventListener("click", async () => {
-  console.log("BOTÃO CONFIRMADO ✅");
-
-  const name = document.getElementById("nome").value;
-  const cpf = document.getElementById("cpf").value;
-  const whatsapp = document.getElementById("whatsapp").value;
-  const totalText = document.getElementById("total-value").textContent;
-
-  const amount = parseInt(totalText.replace(/\D/g, ""));
-
-  const payload = {
-    amount,
-    customer: { name, cpf, whatsapp }
-  };
-
-  const response = await fetch("/api/create-pix", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-
-  const data = await response.json();
-  console.log("RETORNO DO PIX:", data);
-
-  if (data.error) {
-    alert("Erro ao gerar PIX: " + data.error);
-    return;
-  }
-
-  document.getElementById("pix-code").value = data.qrcode;
-  document.getElementById("pix-modal").style.display = "flex";
 });
+
 
 
